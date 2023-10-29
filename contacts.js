@@ -2,13 +2,17 @@ const fs = require("node:fs/promises");
 const path = require("node:path");
 const crypto = require("node:crypto");
 
-const contactsPath = path.join(__dirname, "contacts.json");
+const contactsPath = path.join(__dirname, "./db/contacts.json");
 
 // Повертає масив контактів.
 async function listContacts() {
   const data = await fs.readFile(contactsPath, { encoding: "utf-8" });
 
   return JSON.parse(data);
+}
+
+function writecontacts(contacts) {
+  return fs.writeFile(contactsPath, JSON.stringify(contacts, undefined, 2));
 }
 
 // Повертає об'єкт контакту з таким id. Повертає null, якщо контакт з таким id не знайдений.
@@ -33,7 +37,7 @@ async function removeContact(contactId) {
 
   const newContacts = [...contacts.slice(0, index), ...contacts.slice(index + 1)];
 
-  await listContacts(newContacts);
+  await writecontacts(newContacts);
 
   return contacts[index];
 }
@@ -41,10 +45,10 @@ async function removeContact(contactId) {
 // Повертає об'єкт доданого контакту.
 async function addContact(name, email, phone) {
   const contacts = await listContacts();
-  const contactId = crypto.randomUUID();
-  const newContact = { contactId, name, email, phone };
+  const id = crypto.randomUUID();
+  const newContact = { id, name, email, phone };
   const newContacts = [...contacts, newContact];
-  await listContacts(newContacts);
+  await writecontacts(newContacts);
 
   return newContact;
 }
