@@ -1,20 +1,56 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const crypto = require("node:crypto");
+
 const contactsPath = path.join(__dirname, "contacts.json");
 
-
+// Повертає масив контактів.
 async function listContacts() {
-  // ...твій код. Повертає масив контактів.
+  const data = await fs.readFile(contactsPath, { encoding: "utf-8" });
+
+  return JSON.parse(data);
 }
 
+// Повертає об'єкт контакту з таким id. Повертає null, якщо контакт з таким id не знайдений.
 async function getContactById(contactId) {
-  // ...твій код. Повертає об'єкт контакту з таким id. Повертає null, якщо контакт з таким id не знайдений.
+  const contacts = await listContacts();
+
+  if (contacts.id !== contactId) {
+    return null;
+  }
+
+  return contacts.find((contact) => contact.id === contactId);
 }
 
-async function removeContact(contactId) {
-  // ...твій код. Повертає об'єкт видаленого контакту. Повертає null, якщо контакт з таким id не знайдений.
+// Повертає об'єкт видаленого контакту. Повертає null, якщо контакт з таким id не знайдений.
+async function removeContact(contactId, contact) {
+  const contacts = await listContacts();
+  const index = contacts.findIndex((contact) => contact.id === contactId);
+
+  if (index === -1) {
+    return null;
+  }
+
+  const newContact = { ...contact, contactId };
+  const newContacts = [
+    ...contacts.slice(0, index),
+    newContact,
+    ...contacts.slice(index + 1),
+  ];
+  await listContacts(newContacts);
+
+  return newContact;
 }
 
+// Повертає об'єкт доданого контакту.
 async function addContact(name, email, phone) {
-  // ...твій код. Повертає об'єкт доданого контакту. 
+  const contacts = await listContacts();
+  const contactId = crypto.randomUUID();
+  const newContact = { contactId, name, email, phone };
+  const newContacts = [...contacts, newContact];
+  await listContacts(newContacts);
+
+  return newContact;
 }
+
+module.exports = { listContacts, getContactById, removeContact, addContact };
