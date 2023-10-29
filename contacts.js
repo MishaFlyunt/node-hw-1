@@ -11,6 +11,7 @@ async function listContacts() {
   return JSON.parse(data);
 }
 
+// Перезаписує масив контактів.
 function writecontacts(contacts) {
   return fs.writeFile(contactsPath, JSON.stringify(contacts, undefined, 2));
 }
@@ -19,11 +20,7 @@ function writecontacts(contacts) {
 async function getContactById(contactId) {
   const contacts = await listContacts();
 
-  if (contacts.id !== contactId) {
-    return null;
-  }
-
-  return contacts.find((contact) => contact.id === contactId);
+  return contacts.find((contact) => contact.id === contactId) || null;
 }
 
 // Повертає об'єкт видаленого контакту. Повертає null, якщо контакт з таким id не знайдений.
@@ -54,3 +51,5 @@ async function addContact(name, email, phone) {
 }
 
 module.exports = { listContacts, getContactById, removeContact, addContact };
+
+
