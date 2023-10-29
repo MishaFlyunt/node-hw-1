@@ -23,7 +23,7 @@ async function getContactById(contactId) {
 }
 
 // Повертає об'єкт видаленого контакту. Повертає null, якщо контакт з таким id не знайдений.
-async function removeContact(contactId, contact) {
+async function removeContact(contactId) {
   const contacts = await listContacts();
   const index = contacts.findIndex((contact) => contact.id === contactId);
 
@@ -31,15 +31,11 @@ async function removeContact(contactId, contact) {
     return null;
   }
 
-  const newContact = { ...contact, contactId };
-  const newContacts = [
-    ...contacts.slice(0, index),
-    newContact,
-    ...contacts.slice(index + 1),
-  ];
+  const newContacts = [...contacts.slice(0, index), ...contacts.slice(index + 1)];
+
   await listContacts(newContacts);
 
-  return newContact;
+  return contacts[index];
 }
 
 // Повертає об'єкт доданого контакту.
